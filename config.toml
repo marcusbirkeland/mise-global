@@ -1,0 +1,3 @@
+[tasks.kubeseal]
+description = "Seal secrets using kubeseal"
+run = "~/.config/mise/mise-tasks/kubeseal"

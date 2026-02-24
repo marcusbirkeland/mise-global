@@ -1,0 +1,81 @@
+#!/usr/bin/env bash
+set -e
+
+#MISE description="Seal secrets using kubeseal"
+#USAGE flag "-s --secret <secret>" help="The secret value to seal (if not provided, will prompt)"
+#USAGE flag "-c --cert <cert>" help="Path to the certificate file" {
+#USAGE   choices "test" "prod"
+#USAGE }
+#USAGE flag "-n --namespace <namespace>" help="Kubernetes namespace"
+#USAGE flag "--name <name>" help="Secret name"
+
+# Certificate paths - expand tilde to home directory
+CERT_TEST="${HOME}/.certs/sealed-secrets-pub-cert-TEST.pem"
+CERT_PROD="${HOME}/.certs/sealed-secrets-pub-cert-PROD.pem"
+
+# Get secret value
+if [ -z "${usage_secret}" ]; then
+    echo "Enter secret value:" >&2
+    read -s SECRET_VALUE </dev/tty
+    echo >&2
+else
+    SECRET_VALUE="${usage_secret}"
+fi
+
+# Get certificate
+if [ -z "${usage_cert}" ]; then
+    echo "Select certificate:" >&2
+    echo "1) test" >&2
+    echo "2) prod" >&2
+    read -p "Choice (1-2): " CERT_CHOICE </dev/tty
+    
+    case $CERT_CHOICE in
+        1)
+            CERT_PATH="$CERT_TEST"
+            ;;
+        2)
+            CERT_PATH="$CERT_PROD"
+            ;;
+        *)
+            echo "Invalid choice"
+            exit 1
+            ;;
+    esac
+else
+    case "${usage_cert}" in
+        test)
+            CERT_PATH="$CERT_TEST"
+            ;;
+        prod)
+            CERT_PATH="$CERT_PROD"
+            ;;
+        *)
+            # Assume it's a direct path
+            CERT_PATH="${usage_cert}"
+            ;;
+    esac
+fi
+
+# Get namespace
+if [ -z "${usage_namespace}" ]; then
+    read -p "Enter namespace: " NAMESPACE </dev/tty
+else
+    NAMESPACE="${usage_namespace}"
+fi
+
+# Get secret name
+if [ -z "${usage_name}" ]; then
+    read -p "Enter secret name: " SECRET_NAME </dev/tty
+else
+    SECRET_NAME="${usage_name}"
+fi
+
+# Validate certificate exists
+if [ ! -f "$CERT_PATH" ]; then
+    echo "Error: Certificate file not found: $CERT_PATH"
+    exit 1
+fi
+
+# Run kubeseal
+echo "Sealing secret with kubeseal..."
+echo -n "$SECRET_VALUE" | kubeseal --raw --cert "$CERT_PATH" --namespace "$NAMESPACE" --name "$SECRET_NAME"
