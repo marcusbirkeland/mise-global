@@ -9,7 +9,7 @@ set -e
 #USAGE flag "-n --namespace <namespace>" help="Kubernetes namespace"
 #USAGE flag "--name <name>" help="Secret name"
 
-# Certificate paths - expand tilde to home directory
+# Certificate paths 
 CERT_TEST="${HOME}/.certs/sealed-secrets-pub-cert-TEST.pem"
 CERT_PROD="${HOME}/.certs/sealed-secrets-pub-cert-PROD.pem"
 
