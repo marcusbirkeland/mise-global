@@ -2,6 +2,10 @@
 
 1. Install Mise: <https://github.com/jdx/mise>
 
-2. Clone this repo into `~/.config`mise`.
+2. Clone this repo into `~/.config/mise`.
 
-3. Run scripts with `mise run`
+3. Set up correct paths for certs in the seal script.
+
+4. Make scripts executable, for example run: `chmod +x seal` in the `mise-tasks` folder.
+
+5. Run scripts with `mise run`
