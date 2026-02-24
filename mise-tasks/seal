@@ -77,5 +77,8 @@ if [ ! -f "$CERT_PATH" ]; then
 fi
 
 # Run kubeseal
-echo "Sealing secret with kubeseal..."
-echo -n "$SECRET_VALUE" | kubeseal --raw --cert "$CERT_PATH" --namespace "$NAMESPACE" --name "$SECRET_NAME"
+echo "Sealing secret with kubeseal..." >&2
+SEALED=$(echo -n "$SECRET_VALUE" | kubeseal --raw --cert "$CERT_PATH" --namespace "$NAMESPACE" --name "$SECRET_NAME")
+echo "$SEALED" | pbcopy
+echo "✓ Sealed secret copied to clipboard!" >&2
+echo "$SEALED"
